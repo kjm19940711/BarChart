@@ -238,6 +238,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
         })
         .on("mousedown",function(){
             d3.selectAll(".chartselctarea").remove()
+            d3.selectAll(".chartselctareax").remove()
             linechartsvg.append("rect")
                 .attr("class","chartselctarea")
                 .attr("x",Line_begin_x+leftpad+xScale.rangeBand()*(parseInt((d3.mouse(this)[0]-leftpad-Line_begin_x)/xScale.rangeBand())))
