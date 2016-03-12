@@ -1,7 +1,10 @@
+	.body{
+		-webkit-user-select:none;
+	}
 	.axis path,
 	.axis line{
 		fill: none;
-		stroke: black;
+		stroke: white;
 		shape-rendering: crispEdges;
 	}
 
