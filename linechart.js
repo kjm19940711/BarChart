@@ -26,10 +26,13 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 	var xScale = d3.scale.linear()
 		.domain([0,Num.length-1])
 		.range([padding,w-padding]);
+	var XStep=(xScale.range()[1]-xScale.range()[0])/(dataset.length-1);
+	
 	//纵坐标轴比例尺
 	var yScale = d3.scale.linear()
 		.domain([0,d3.max(Num)])
 		.range([h-padding,padding]);
+	var YStep=(yScale.range()[1]-yScale.range()[0])/d3.max(dataset);
 	//定义横轴
 	var xAxis = d3.svg.axis()
 		.scale(xScale)
@@ -91,7 +94,36 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 			return yScale(d);
 		})
 		.attr("r",5)
-		.style("fill","rgb(191,38,207)");
+		.style("fill","rgb(191,38,207)")
+		.on("mousemove",function(d,i){
+			d3.select("#Line_Label_Point").remove();
+			var Line_Label_X=xScale(i);
+			var Line_Label_Y=yScale(d);
+			console.log(i,d)
+			var Line_Label_Point=d3.select("body").append("svg")
+				.attr("id","Line_Label_Point")
+				.style("border-radius",6+"px")
+				.style("width",80+"px")
+				.style("height",50+"px")
+				.style("background","#80e5dc")
+				.style("position","absolute")
+				.style("top",Line_Label_Y+top+"px")
+				.style("left",Line_Label_X+left+"px")
+				.style("opacity",0.8);
+			Line_Label_Point.append("text")
+				.attr("x",10)
+				.attr("y",20)
+				.text(xname+":"+i)
+				.style("font-family","Arial,Verdana,Sans-serif");
+			Line_Label_Point.append("text")
+				.attr("x",10)
+				.attr("y",40)
+				.text(yname+":"+d)
+				.style("font-family","Arial,Verdana,Sans-serif");
+				
+				
+
+		});
 	svg.on("mousedown",function(){
 			var MouseX=d3.event.x;
 			var MouseY=d3.event.y;
@@ -100,6 +132,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 			d3.select("#LineSvg_cover_x_assist").remove();
 			d3.select("#LineSvg_cover_x_").remove();
 			d3.select("#Line_Svg_Cover_Remove").remove();
+			var BeginMouseX=Math.round((MouseX-padding-left)/XStep)*XStep+left+padding;
 			d3.select("body").append("svg")
 					.attr("id","LineSvg_cover_x")
 					.style("width",0+"px")
@@ -107,7 +140,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 					.style("background","#FF7F50")
 					.style("position","absolute")
 					.style("top",top+padding+"px")
-					.style("left",MouseX+"px")
+					.style("left",BeginMouseX+"px")
 					.style("opacity",0.3);
 			d3.select("body").append("svg")
 					.attr("id","LineSvg_cover_x_")
@@ -116,8 +149,9 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 					.style("background","#000000")
 					.style("position","absolute")
 					.style("top",top+height-padding+"px")
-					.style("left",MouseX+"px")
+					.style("left",BeginMouseX+"px")
 					.style("opacity",0.2);
+			
 			d3.select("body").append("svg")
 				.attr("id","LineSvg_cover_x_assist")
 				.style("position","absolute")
@@ -129,8 +163,8 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 					
 					{
 						if(d3.event.x>=MouseX&&d3.event.x<=w-padding+left+2){
-							d3.select("#LineSvg_cover_x").style("width",d3.event.x-MouseX+"px");
-							d3.select("#LineSvg_cover_x_").style("width",d3.event.x-MouseX+"px");
+							d3.select("#LineSvg_cover_x").style("width",Math.round((d3.event.x-BeginMouseX)/XStep)*XStep+"px");
+							d3.select("#LineSvg_cover_x_").style("width",Math.round((d3.event.x-BeginMouseX)/XStep)*XStep+"px");
 						}
 						
 					}
@@ -138,9 +172,12 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 				.on("mouseup",function(){
 					if(d3.event.x>=MouseX&&d3.event.x<=w-padding+left+2)
 					{
-						d3.select("#LineSvg_cover_x").style("width",d3.event.x-MouseX+"px");
-						d3.select("#LineSvg_cover_x_").style("width",d3.event.x-MouseX+"px");
-						Line_Svg_Cover_Remove(d3.event.x,top+h-padding);
+						d3.select("#LineSvg_cover_x").style("width",Math.round((d3.event.x-BeginMouseX)/XStep)*XStep+"px");
+						d3.select("#LineSvg_cover_x_").style("width",Math.round((d3.event.x-BeginMouseX)/XStep)*XStep+"px");
+					if (Math.round((d3.event.x-BeginMouseX)/XStep)*XStep>0){
+						Line_Svg_Cover_Remove(Math.round((d3.event.x-BeginMouseX)/XStep)*XStep+BeginMouseX,top+h-padding);
+						console.log(xname+":["+Math.round((MouseX-padding-left)/XStep)+","+(Math.round((d3.event.x-BeginMouseX)/XStep)+Math.round((MouseX-padding-left)/XStep))+"]")
+					}
 					}
 				d3.select(this).remove();
 				});
@@ -151,13 +188,14 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 			d3.select("#LineSvg_cover_y").remove();
 			d3.select("#LineSvg_cover_y_assist").remove();
 			d3.select("#LineSvg_cover_y_").remove();
+			var BeginMouseY=(Math.round((MouseY-padding-top)/YStep))*YStep+top+padding;
 			d3.select("body").append("svg")
 					.attr("id","LineSvg_cover_y")
 					.style("width",w-2*padding+"px")
 					.style("height",0+"px")
 					.style("background","#FF7F50")
 					.style("position","absolute")
-					.style("top",MouseY+"px")
+					.style("top",BeginMouseY+"px")
 					.style("left",left+padding+"px")
 					.style("opacity",0.2);
 			d3.select("body").append("svg")
@@ -166,7 +204,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 					.style("height",0+"px")
 					.style("background","#000000")
 					.style("position","absolute")
-					.style("top",MouseY+"px")
+					.style("top",BeginMouseY+"px")
 					.style("left",left+10+"px")
 					.style("opacity",0.2);
 			d3.select("body").append("svg")
@@ -181,8 +219,8 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 					{
 						
 						if(d3.event.y>=MouseY&&d3.event.y<=top+h-padding){
-							d3.select("#LineSvg_cover_y").style("height",d3.event.y-MouseY+"px");
-							d3.select("#LineSvg_cover_y_").style("height",d3.event.y-MouseY+"px");
+							d3.select("#LineSvg_cover_y").style("height",Math.round((d3.event.y-MouseY)/YStep)*YStep+"px");
+							d3.select("#LineSvg_cover_y_").style("height",Math.round((d3.event.y-MouseY)/YStep)*YStep+"px");
 						}
 						
 					}
@@ -190,8 +228,11 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 				.on("mouseup",function(){
 					if(d3.event.y>=MouseY&&d3.event.y<=top+h-padding)
 					{
-						d3.select("#LineSvg_cover_y").style("height",d3.event.y-MouseY+"px");
-						d3.select("#LineSvg_cover_y_").style("height",d3.event.y-MouseY+"px");
+						d3.select("#LineSvg_cover_y").style("height",Math.round((d3.event.y-MouseY)/YStep)*YStep+"px");
+						d3.select("#LineSvg_cover_y_").style("height",Math.round((d3.event.y-MouseY)/YStep)*YStep+"px");
+						if (Math.round((d3.event.y-MouseY)/YStep)*YStep>0){
+							console.log(yname+":["+(10+Math.round((MouseY-padding-top)/YStep)+Math.round((d3.event.y-MouseY)/YStep))+","+(10+Math.round((MouseY-padding-top)/YStep))+"]")
+						}
 					}
 				d3.select(this).remove();
 				});
@@ -214,6 +255,7 @@ function Line_Svg_Cover_Remove(left,top){
 				d3.select("#LineSvg_cover_x_assist").remove();
 				d3.select("#LineSvg_cover_x_").remove();
 				d3.select("#Line_Svg_Cover_Remove").remove();
+				d3.select("#Line_Label_Point").remove();
 		})
 		.append("circle")
 		.attr("id","Bar_circle_Cover_Remove")
