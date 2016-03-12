@@ -109,7 +109,8 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 				.style("position","absolute")
 				.style("top",Line_Label_Y+top+"px")
 				.style("left",Line_Label_X+left+"px")
-				.style("opacity",0.8);
+				.style("opacity",0.8)
+				.style("-webkit-user-select","none");
 			Line_Label_Point.append("text")
 				.attr("x",10)
 				.attr("y",20)
