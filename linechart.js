@@ -78,6 +78,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 		.style("text-anchor", "end")
 		.style("-webkit-user-select","none")
 		.text(yname);*/
+		
 
 
 
@@ -91,6 +92,17 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
     {
     	data.push([i+1,Num[i]]);
     }
+    var line = d3.svg.line()
+	.interpolate("step-after")
+	.x(function(d,i){return xScale(i);})
+	.y(function(d){return yScale(d);});
+    var path=svg.append("path")
+	.attr("d", line(data))
+	.style("fill","#F00")
+	.style("fill","none")
+	.style("stroke-width",1)
+	.style("stroke","#F00")
+	.style("stroke-opacity",0.9);
 
     //linechartsvg.append("rect")
     //    .attr("x",260)
