@@ -92,18 +92,6 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
     {
     	data.push([i+1,Num[i]]);
     }
-    function getData()
-	{
-		var dataNum=15;
-		dataset=[];
-		xMarks=[];
-	for(i=1;i<dataNum;i++)
-	{
-		dataset.push(Math.round(Math.random()*h));
-		xMarks.push("标签"+i);
-	}
-    }
-    getData()
     var line = d3.svg.line()
 	.interpolate("step-after")
 	.x(function(d,i){return xScale(i);})
