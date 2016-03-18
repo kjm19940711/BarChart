@@ -96,7 +96,7 @@ function paint_linechart(Num,xname,yname,width,height,left,top,div)
 	.interpolate("step-after")
 	.x(function(d,i){return xScale(i);})
 	.y(function(d){return yScale(d);});
-    var path=svg.append("path")
+    var path=linechartsvg.append("path")
 	.attr("d", line(data))
 	.style("fill","#F00")
 	.style("fill","none")
